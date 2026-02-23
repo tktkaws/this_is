@@ -6,21 +6,44 @@ import starlight from '@astrojs/starlight';
 export default defineConfig({
 	integrations: [
 		starlight({
-			title: 'My Docs',
-			social: [{ icon: 'github', label: 'GitHub', href: 'https://github.com/withastro/starlight' }],
+			title: 'Takayuki Takahashi',
+			defaultLocale: 'root',
+			locales: {
+				root: {
+					label: '日本語',
+					lang: 'ja',
+				},
+			},
 			sidebar: [
 				{
-					label: 'Guides',
-					items: [
-						// Each item here is one entry in the navigation menu.
-						{ label: 'Example Guide', slug: 'guides/example' },
-					],
+					label: '自己紹介',
+					autogenerate: { directory: 'introduction' },
 				},
 				{
-					label: 'Reference',
-					autogenerate: { directory: 'reference' },
+					label: '技術スタック',
+					autogenerate: { directory: 'skills' },
+				},
+				{
+					label: '職歴・経歴',
+					autogenerate: { directory: 'career' },
+				},
+				{
+					label: 'プロジェクト実績',
+					autogenerate: { directory: 'projects' },
+				},
+				{
+					label: 'ブログ',
+					autogenerate: { directory: 'blog' },
+				},
+				{
+					label: '連絡先',
+					autogenerate: { directory: 'contact' },
 				},
 			],
+			tableOfContents: {
+				minHeadingLevel: 2,
+				maxHeadingLevel: 3,
+			},
 		}),
 	],
 });
