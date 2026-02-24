@@ -1,0 +1,65 @@
+---
+import { getCollection } from 'astro:content';
+
+interface Props {
+	currentSlug: string;
+}
+
+const { currentSlug } = Astro.props;
+
+const pages = await getCollection('pages');
+
+const sidebarCategories = [
+	{ label: '自己紹介', directory: 'introduction' },
+	{ label: '技術スタック', directory: 'skills' },
+	{ label: '職歴・経歴', directory: 'career' },
+	{ label: 'プロジェクト実績', directory: 'projects' },
+	{ label: 'ブログ', directory: 'blog' },
+	{ label: '連絡先', directory: 'contact' },
+];
+
+const sidebarItems = sidebarCategories.map((cat) => {
+	const items = pages
+		.filter((p) => p.id.startsWith(cat.directory + '/') || p.id.startsWith(cat.directory + '\\'))
+		.sort((a, b) => (a.data.order ?? 99) - (b.data.order ?? 99));
+	const indexPage = items.find((p) => p.id.endsWith('/index') || p.id === cat.directory + '/index');
+	const href = indexPage ? `/${indexPage.id}/` : `/${cat.directory}/`;
+	return { label: cat.label, href, items };
+});
+---
+
+<aside class="hidden lg:block w-64 shrink-0 border-r border-[var(--color-border)] bg-[var(--color-sidebar-bg)]">
+	<nav class="sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto p-4" aria-label="サイドバー">
+		<ul class="space-y-6">
+			{sidebarItems.map((group) => (
+				<li>
+					<a href={group.href} class="block text-sm font-semibold text-[var(--color-text-secondary)] hover:text-[var(--color-text)] uppercase tracking-wider mb-2 transition-colors">
+						{group.label}
+					</a>
+					<ul class="space-y-1">
+						{group.items.map((item) => {
+							const isActive = currentSlug === item.id;
+							const href = `/${item.id}/`;
+							return (
+								<li>
+									<a
+										href={href}
+										class:list={[
+											'block px-3 py-1.5 rounded-md text-sm transition-colors',
+											isActive
+												? 'bg-[var(--color-sidebar-active)] text-[var(--color-sidebar-active-text)] font-medium'
+												: 'text-[var(--color-text)] hover:bg-[var(--color-bg-secondary)]',
+										]}
+										aria-current={isActive ? 'page' : undefined}
+									>
+										{item.data.title}
+									</a>
+								</li>
+							);
+						})}
+					</ul>
+				</li>
+			))}
+		</ul>
+	</nav>
+</aside>

@@ -1,0 +1,33 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Header from '../components/Header.astro';
+import MobileMenu from '../components/MobileMenu.astro';
+import Sidebar from '../components/Sidebar.astro';
+---
+
+<BaseLayout title="Takayuki Takahashi" description="エンジニアの自己紹介サイト">
+	<Header />
+	<MobileMenu />
+	<div class="mx-auto max-w-screen-xl flex">
+		<Sidebar currentSlug="" />
+		<main class="flex-1 min-w-0 px-6 py-8 lg:px-12">
+			<div class="max-w-2xl mx-auto text-center py-16">
+				<h1 class="text-4xl font-bold mb-4 text-[var(--color-text)]">Takayuki Takahashi</h1>
+				<p class="text-xl text-[var(--color-text-secondary)] mb-8">ソフトウェアエンジニア</p>
+				<p class="text-[var(--color-text-secondary)] mb-8 leading-7">
+					このサイトは Takayuki Takahashi のポートフォリオ・自己紹介サイトです。<br />
+					技術スタック、職歴、プロジェクト実績などをまとめています。
+				</p>
+				<a
+					href="/introduction/"
+					class="inline-flex items-center gap-2 px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+				>
+					自己紹介を見る
+					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+					</svg>
+				</a>
+			</div>
+		</main>
+	</div>
+</BaseLayout>

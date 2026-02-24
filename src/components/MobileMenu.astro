@@ -1,0 +1,63 @@
+---
+import { getCollection } from 'astro:content';
+
+const pages = await getCollection('pages');
+
+const sidebarCategories = [
+	{ label: '自己紹介', directory: 'introduction' },
+	{ label: '技術スタック', directory: 'skills' },
+	{ label: '職歴・経歴', directory: 'career' },
+	{ label: 'プロジェクト実績', directory: 'projects' },
+	{ label: 'ブログ', directory: 'blog' },
+	{ label: '連絡先', directory: 'contact' },
+];
+
+const sidebarItems = sidebarCategories.map((cat) => {
+	const items = pages
+		.filter((p) => p.id.startsWith(cat.directory + '/') || p.id.startsWith(cat.directory + '\\'))
+		.sort((a, b) => (a.data.order ?? 99) - (b.data.order ?? 99));
+	return { label: cat.label, items };
+});
+---
+
+<div id="mobile-menu-overlay" class="hidden fixed inset-0 z-40 bg-black/50 lg:hidden"></div>
+<div
+	id="mobile-menu"
+	class="fixed top-14 left-0 z-50 h-[calc(100vh-3.5rem)] w-72 -translate-x-full transition-transform duration-200 bg-[var(--color-sidebar-bg)] border-r border-[var(--color-border)] overflow-y-auto lg:hidden"
+>
+	<nav class="p-4" aria-label="モバイルメニュー">
+		<ul class="space-y-6">
+			{sidebarItems.map((group) => (
+				<li>
+					<p class="text-sm font-semibold text-[var(--color-text-secondary)] uppercase tracking-wider mb-2">
+						{group.label}
+					</p>
+					<ul class="space-y-1">
+						{group.items.map((item) => {
+							const href = `/${item.id}/`;
+							return (
+								<li>
+									<a
+										href={href}
+										class="block px-3 py-1.5 rounded-md text-sm text-[var(--color-text)] hover:bg-[var(--color-bg-secondary)] transition-colors"
+									>
+										{item.data.title}
+									</a>
+								</li>
+							);
+						})}
+					</ul>
+				</li>
+			))}
+		</ul>
+	</nav>
+</div>
+
+<script>
+	const overlay = document.getElementById('mobile-menu-overlay');
+	overlay?.addEventListener('click', () => {
+		const menu = document.getElementById('mobile-menu');
+		menu?.classList.add('-translate-x-full');
+		overlay.classList.add('hidden');
+	});
+</script>

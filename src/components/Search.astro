@@ -1,0 +1,119 @@
+---
+---
+
+<div id="search-modal" class="hidden fixed inset-0 z-50">
+	<div id="search-overlay" class="absolute inset-0 bg-black/50"></div>
+	<div class="relative mx-auto mt-20 max-w-lg px-4">
+		<div class="rounded-lg bg-[var(--color-bg)] border border-[var(--color-border)] shadow-2xl overflow-hidden">
+			<div class="p-4">
+				<div class="flex items-center gap-2 border-b border-[var(--color-border)] pb-3">
+					<svg class="w-5 h-5 text-[var(--color-text-secondary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+					</svg>
+					<input
+						id="search-input"
+						type="text"
+						placeholder="検索..."
+						class="flex-1 bg-transparent outline-none text-[var(--color-text)] placeholder:text-[var(--color-text-secondary)]"
+						autocomplete="off"
+					/>
+					<kbd class="text-xs px-1.5 py-0.5 rounded bg-[var(--color-bg-secondary)] text-[var(--color-text-secondary)] border border-[var(--color-border)]">Esc</kbd>
+				</div>
+				<div id="search-results" class="mt-3 max-h-80 overflow-y-auto">
+					<p class="text-sm text-[var(--color-text-secondary)] text-center py-8">
+						検索キーワードを入力してください
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script is:inline>
+	(function() {
+		function initSearch() {
+			var modal = document.getElementById('search-modal');
+			var overlay = document.getElementById('search-overlay');
+			var input = document.getElementById('search-input');
+			var results = document.getElementById('search-results');
+			var searchToggle = document.getElementById('search-toggle');
+			var defaultMsg = '<p class="text-sm text-[var(--color-text-secondary)] text-center py-8">検索キーワードを入力してください</p>';
+
+			function openSearch() {
+				if (modal) modal.classList.remove('hidden');
+				if (input) input.focus();
+			}
+
+			function closeSearch() {
+				if (modal) modal.classList.add('hidden');
+				if (input) input.value = '';
+				if (results) results.innerHTML = defaultMsg;
+			}
+
+			if (searchToggle) searchToggle.addEventListener('click', openSearch);
+			if (overlay) overlay.addEventListener('click', closeSearch);
+
+			document.addEventListener('keydown', function(e) {
+				if (e.key === 'Escape') closeSearch();
+				if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+					e.preventDefault();
+					if (modal && modal.classList.contains('hidden')) {
+						openSearch();
+					} else {
+						closeSearch();
+					}
+				}
+			});
+
+			var pagefind = null;
+
+			async function loadPagefind() {
+				if (pagefind) return pagefind;
+				try {
+					pagefind = await import('/pagefind/pagefind.js');
+					await pagefind.init();
+					return pagefind;
+				} catch (e) {
+					return null;
+				}
+			}
+
+			if (input) {
+				input.addEventListener('input', async function() {
+					var query = input.value.trim();
+					if (!results) return;
+
+					if (!query) {
+						results.innerHTML = defaultMsg;
+						return;
+					}
+
+					var pf = await loadPagefind();
+					if (!pf) {
+						results.innerHTML = '<p class="text-sm text-[var(--color-text-secondary)] text-center py-8">検索機能はビルド後に利用できます</p>';
+						return;
+					}
+
+					var search = await pf.search(query);
+
+					if (search.results.length === 0) {
+						results.innerHTML = '<p class="text-sm text-[var(--color-text-secondary)] text-center py-8">結果が見つかりませんでした</p>';
+						return;
+					}
+
+					var items = await Promise.all(search.results.slice(0, 8).map(function(r) { return r.data(); }));
+					results.innerHTML = items
+						.map(function(item) {
+							return '<a href="' + item.url + '" class="block p-3 rounded-md hover:bg-[var(--color-bg-secondary)] transition-colors">' +
+								'<p class="text-sm font-medium text-[var(--color-text)]">' + (item.meta.title || item.url) + '</p>' +
+								'<p class="text-xs text-[var(--color-text-secondary)] mt-1 line-clamp-2">' + item.excerpt + '</p>' +
+								'</a>';
+						})
+						.join('');
+				});
+			}
+		}
+
+		initSearch();
+	})();
+</script>

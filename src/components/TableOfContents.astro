@@ -1,0 +1,72 @@
+---
+import type { MarkdownHeading } from 'astro';
+
+interface Props {
+	headings: MarkdownHeading[];
+}
+
+const { headings } = Astro.props;
+const tocHeadings = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
+---
+
+{tocHeadings.length > 0 && (
+	<aside class="hidden xl:block w-56 shrink-0">
+		<nav class="sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto py-8 pr-4" aria-label="目次">
+			<p class="text-sm font-semibold text-[var(--color-text-secondary)] mb-3">目次</p>
+			<ul class="space-y-1 text-sm" id="toc-list">
+				{tocHeadings.map((heading) => (
+					<li>
+						<a
+							href={`#${heading.slug}`}
+							class:list={[
+								'block py-1 transition-colors text-[var(--color-text-secondary)] hover:text-[var(--color-text)]',
+								heading.depth === 3 ? 'pl-4' : '',
+							]}
+							data-toc-link
+							data-heading-slug={heading.slug}
+						>
+							{heading.text}
+						</a>
+					</li>
+				))}
+			</ul>
+		</nav>
+	</aside>
+)}
+
+<script>
+	function initToc() {
+		const links = document.querySelectorAll('[data-toc-link]');
+		if (links.length === 0) return;
+
+		const headingIds = Array.from(links).map((link) =>
+			(link as HTMLElement).dataset.headingSlug!
+		);
+
+		const observer = new IntersectionObserver(
+			(entries) => {
+				for (const entry of entries) {
+					if (entry.isIntersecting) {
+						links.forEach((link) => {
+							const slug = (link as HTMLElement).dataset.headingSlug;
+							if (slug === entry.target.id) {
+								link.classList.add('!text-primary-600', 'dark:!text-primary-400', 'font-medium');
+							} else {
+								link.classList.remove('!text-primary-600', 'dark:!text-primary-400', 'font-medium');
+							}
+						});
+					}
+				}
+			},
+			{ rootMargin: '-80px 0px -80% 0px' }
+		);
+
+		headingIds.forEach((id) => {
+			const el = document.getElementById(id);
+			if (el) observer.observe(el);
+		});
+	}
+
+	initToc();
+	document.addEventListener('astro:after-swap', initToc);
+</script>

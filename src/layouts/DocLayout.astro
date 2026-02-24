@@ -1,0 +1,38 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Header from '../components/Header.astro';
+import Sidebar from '../components/Sidebar.astro';
+import MobileMenu from '../components/MobileMenu.astro';
+import TableOfContents from '../components/TableOfContents.astro';
+import PageNavigation from '../components/PageNavigation.astro';
+import Breadcrumbs from '../components/Breadcrumbs.astro';
+import type { MarkdownHeading } from 'astro';
+
+interface Props {
+	title: string;
+	description?: string;
+	headings?: MarkdownHeading[];
+	currentSlug?: string;
+	prevPage?: { title: string; slug: string } | null;
+	nextPage?: { title: string; slug: string } | null;
+}
+
+const { title, description, headings = [], currentSlug = '', prevPage = null, nextPage = null } = Astro.props;
+---
+
+<BaseLayout title={title} description={description}>
+	<Header />
+	<MobileMenu />
+	<div class="mx-auto max-w-screen-xl flex">
+		<Sidebar currentSlug={currentSlug} />
+		<main class="flex-1 min-w-0 px-6 py-8 lg:px-12">
+			<Breadcrumbs currentSlug={currentSlug} title={title} />
+			<article class="prose">
+				<h1 class="!mt-0">{title}</h1>
+				<slot />
+			</article>
+			<PageNavigation prevPage={prevPage} nextPage={nextPage} />
+		</main>
+		<TableOfContents headings={headings} />
+	</div>
+</BaseLayout>

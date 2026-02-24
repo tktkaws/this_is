@@ -1,0 +1,45 @@
+---
+interface Props {
+	prevPage?: { title: string; slug: string } | null;
+	nextPage?: { title: string; slug: string } | null;
+}
+
+const { prevPage, nextPage } = Astro.props;
+---
+
+{(prevPage || nextPage) && (
+	<nav class="mt-12 pt-6 border-t border-[var(--color-border)] grid grid-cols-2 gap-4" aria-label="ページナビゲーション">
+		{prevPage ? (
+			<a
+				href={prevPage.slug}
+				class="group flex flex-col p-4 rounded-lg border border-[var(--color-border)] hover:border-primary-500 transition-colors"
+			>
+				<span class="text-xs text-[var(--color-text-secondary)] mb-1">前のページ</span>
+				<span class="text-sm font-medium text-primary-600 dark:text-primary-400 group-hover:text-primary-700 dark:group-hover:text-primary-300 flex items-center gap-1">
+					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+					</svg>
+					{prevPage.title}
+				</span>
+			</a>
+		) : (
+			<div />
+		)}
+		{nextPage ? (
+			<a
+				href={nextPage.slug}
+				class="group flex flex-col items-end p-4 rounded-lg border border-[var(--color-border)] hover:border-primary-500 transition-colors"
+			>
+				<span class="text-xs text-[var(--color-text-secondary)] mb-1">次のページ</span>
+				<span class="text-sm font-medium text-primary-600 dark:text-primary-400 group-hover:text-primary-700 dark:group-hover:text-primary-300 flex items-center gap-1">
+					{nextPage.title}
+					<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+						<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+					</svg>
+				</span>
+			</a>
+		) : (
+			<div />
+		)}
+	</nav>
+)}
