@@ -1,6 +1,8 @@
 ---
 title: 連絡先
 description: お問い合わせ・連絡先情報
+category: 連絡先
+order: 7
 ---
 
 ## 連絡先

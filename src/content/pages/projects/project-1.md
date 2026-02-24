@@ -1,6 +1,8 @@
 ---
 title: EC サイトリニューアル
 description: EC サイトのフルリニューアルプロジェクト
+category: プロジェクト実績
+order: 5
 ---
 
 ## 概要

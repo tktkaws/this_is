@@ -1,6 +1,8 @@
 ---
 title: はじめての投稿
 description: ブログの最初の記事
+category: ブログ
+order: 6
 ---
 
 ## はじめに

@@ -1,6 +1,8 @@
 ---
 title: 職歴・経歴
 description: これまでの職歴と経歴
+category: 職歴・経歴
+order: 3
 ---
 
 ## 職歴

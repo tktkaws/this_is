@@ -1,13 +1,8 @@
 ---
 title: Takayuki Takahashi
 description: エンジニアの自己紹介サイト
-template: splash
-hero:
-  tagline: ソフトウェアエンジニア
-  actions:
-    - text: 自己紹介を見る
-      link: /introduction/
-      icon: right-arrow
+category: home
+order: 0
 ---
 
 ## ようこそ

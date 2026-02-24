@@ -1,6 +1,8 @@
 ---
 title: 技術スタック
 description: 使用している技術・ツール
+category: 技術スタック
+order: 2
 ---
 
 ## プログラミング言語
