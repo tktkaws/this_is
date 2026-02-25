@@ -3,21 +3,17 @@ import BaseLayout from './BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Sidebar from '../components/Sidebar.astro';
 import MobileMenu from '../components/MobileMenu.astro';
-import TableOfContents from '../components/TableOfContents.astro';
 import PageNavigation from '../components/PageNavigation.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
-import type { MarkdownHeading } from 'astro';
-
 interface Props {
 	title: string;
 	description?: string;
-	headings?: MarkdownHeading[];
 	currentSlug?: string;
 	prevPage?: { title: string; slug: string } | null;
 	nextPage?: { title: string; slug: string } | null;
 }
 
-const { title, description, headings = [], currentSlug = '', prevPage = null, nextPage = null } = Astro.props;
+const { title, description, currentSlug = '', prevPage = null, nextPage = null } = Astro.props;
 ---
 
 <BaseLayout title={title} description={description}>
@@ -33,6 +29,5 @@ const { title, description, headings = [], currentSlug = '', prevPage = null, ne
 			</article>
 			<PageNavigation prevPage={prevPage} nextPage={nextPage} />
 		</main>
-		<TableOfContents headings={headings} />
 	</div>
 </BaseLayout>
