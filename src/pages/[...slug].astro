@@ -23,13 +23,12 @@ export async function getStaticPaths() {
 }
 
 const { page, prevPage, nextPage } = Astro.props;
-const { Content, headings } = await render(page);
+const { Content } = await render(page);
 ---
 
 <DocLayout
 	title={page.data.title}
 	description={page.data.description}
-	headings={headings}
 	currentSlug={page.id}
 	prevPage={prevPage}
 	nextPage={nextPage}
