@@ -3,16 +3,19 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import Header from '../components/Header.astro';
 import MobileMenu from '../components/MobileMenu.astro';
 import Sidebar from '../components/Sidebar.astro';
+import Footer from '../components/Footer.astro';
 ---
 
 <BaseLayout title="Takayuki Takahashi" description="エンジニアの自己紹介サイト">
 	<Header />
 	<MobileMenu />
-	<div class="mx-auto max-w-screen-xl flex">
+	<div class="mx-auto max-w-screen-xl flex min-h-[calc(100vh-3.5rem-3.5rem)]">
 		<Sidebar currentSlug="" />
-		<main class="flex-1 min-w-0 px-6 py-8 lg:px-12">
+		<main id="main-content" class="flex-1 min-w-0 px-6 py-8 lg:px-12">
 			<div class="max-w-2xl mx-auto text-center py-16">
-				<h1 class="text-4xl font-bold mb-4 text-[var(--color-text)]">Takayuki Takahashi</h1>
+				<h1 class="text-4xl font-bold mb-4 text-[var(--color-text)]" data-animate-title aria-label="This is Takayuki Takahashi">
+					<span aria-hidden="true">{"This is Takayuki Takahashi".split('').map((char) => (<span class="inline-block opacity-0">{char === ' ' ? '\u00A0' : char}</span>))}</span>
+				</h1>
 				<p class="text-xl text-[var(--color-text-secondary)] mb-8">ソフトウェアエンジニア</p>
 				<p class="text-[var(--color-text-secondary)] mb-8 leading-7">
 					このサイトは Takayuki Takahashi のポートフォリオ・自己紹介サイトです。<br />
@@ -30,4 +33,29 @@ import Sidebar from '../components/Sidebar.astro';
 			</div>
 		</main>
 	</div>
+	<Footer />
+<script>
+	import gsap from 'gsap';
+
+	function animateTitle() {
+		const title = document.querySelector('[data-animate-title]');
+		if (!title) return;
+
+		const chars = title.querySelectorAll('span');
+		gsap.fromTo(
+			chars,
+			{ opacity: 0, y: 20 },
+			{
+				opacity: 1,
+				y: 0,
+				duration: 0.4,
+				stagger: 0.01,
+				ease: 'power2.out',
+			}
+		);
+	}
+
+	animateTitle();
+	document.addEventListener('astro:after-swap', animateTitle);
+</script>
 </BaseLayout>
