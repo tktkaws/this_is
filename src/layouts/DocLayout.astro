@@ -1,33 +1,87 @@
 ---
+import type { MarkdownHeading } from 'astro';
 import BaseLayout from './BaseLayout.astro';
 import Header from '../components/Header.astro';
 import Sidebar from '../components/Sidebar.astro';
 import MobileMenu from '../components/MobileMenu.astro';
 import PageNavigation from '../components/PageNavigation.astro';
-import Breadcrumbs from '../components/Breadcrumbs.astro';
+import Footer from '../components/Footer.astro';
+
 interface Props {
 	title: string;
 	description?: string;
 	currentSlug?: string;
 	prevPage?: { title: string; slug: string } | null;
 	nextPage?: { title: string; slug: string } | null;
+	headings?: MarkdownHeading[];
 }
 
-const { title, description, currentSlug = '', prevPage = null, nextPage = null } = Astro.props;
+const { title, description, currentSlug = '', prevPage = null, nextPage = null, headings = [] } = Astro.props;
+const tocHeadings = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
 ---
 
 <BaseLayout title={title} description={description}>
 	<Header />
 	<MobileMenu />
-	<div class="mx-auto max-w-screen-xl flex">
+	<div class="mx-auto max-w-screen-xl flex min-h-[calc(100vh-3.5rem-3.5rem)]">
 		<Sidebar currentSlug={currentSlug} />
-		<main class="flex-1 min-w-0 px-6 py-8 lg:px-12">
-			<Breadcrumbs currentSlug={currentSlug} title={title} />
+		<main id="main-content" class="flex-1 min-w-0 px-6 py-8 lg:px-12">
 			<article class="prose">
-				<h1 class="!mt-0">{title}</h1>
+				<h1 class="!mt-0" data-animate-title aria-label={title}>
+					<span aria-hidden="true">
+						{title.split('').map((char) => (
+							<span class="inline-block opacity-0">{char === ' ' ? '\u00A0' : char}</span>
+						))}
+					</span>
+				</h1>
+				{tocHeadings.length > 0 && (
+					<nav class="not-prose my-6 rounded-lg border border-[var(--color-border)] bg-[var(--color-bg-secondary)] px-5 py-4" aria-label="目次">
+						<p class="text-sm font-semibold text-[var(--color-text-secondary)] mb-2">目次</p>
+						<ul class="space-y-1 text-sm">
+							{tocHeadings.map((heading) => (
+								<li>
+									<a
+										href={`#${heading.slug}`}
+										class:list={[
+											'block py-0.5 transition-colors text-[var(--color-text-secondary)] hover:text-primary-600 dark:hover:text-primary-400',
+											heading.depth === 3 ? 'pl-4' : '',
+										]}
+									>
+										{heading.text}
+									</a>
+								</li>
+							))}
+						</ul>
+					</nav>
+				)}
 				<slot />
 			</article>
 			<PageNavigation prevPage={prevPage} nextPage={nextPage} />
 		</main>
 	</div>
+	<Footer />
+<script>
+	import gsap from 'gsap';
+
+	function animateTitle() {
+		const title = document.querySelector('[data-animate-title]');
+		if (!title) return;
+
+		const chars = title.querySelectorAll('span');
+		gsap.fromTo(
+			chars,
+			{ opacity: 0, y: 20 },
+			{
+				opacity: 1,
+				y: 0,
+				duration: 0.4,
+				stagger: 0.03,
+				ease: 'power2.out',
+			}
+		);
+	}
+
+	animateTitle();
+	document.addEventListener('astro:after-swap', animateTitle);
+</script>
 </BaseLayout>
