@@ -10,25 +10,18 @@ const { currentSlug } = Astro.props;
 
 const pages = await getCollection('pages');
 
-const sidebarCategories = [
-	{ label: '自己紹介', directory: 'introduction' },
-	{ label: '技術スタック', directory: 'skills' },
-	{ label: '職歴・経歴', directory: 'career' },
-	{ label: 'プロジェクト実績', directory: 'projects' },
-	{ label: '連絡先', directory: 'contact' },
-];
+const categoryRoots = pages
+	.filter((p) => p.id !== 'index' && !p.id.includes('/'))
+	.sort((a, b) => (a.data.order ?? 99) - (b.data.order ?? 99));
 
 const sidebarItems = await Promise.all(
-	sidebarCategories.map(async (cat) => {
-		const page = pages.find((p) => p.id === cat.directory);
-		const href = `/${cat.directory}/`;
-		const isActive = currentSlug === cat.directory || currentSlug.startsWith(cat.directory + '/');
+	categoryRoots.map(async (page) => {
+		const href = `/${page.id}/`;
+		const isActive = currentSlug === page.id || currentSlug.startsWith(page.id + '/');
 		let tocHeadings: MarkdownHeading[] = [];
-		if (page) {
-			const { headings } = await render(page);
-			tocHeadings = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
-		}
-		return { label: cat.label, href, isActive, tocHeadings };
+		const { headings } = await render(page);
+		tocHeadings = headings.filter((h) => h.depth >= 2 && h.depth <= 3);
+		return { label: page.data.category || page.data.title, href, isActive, tocHeadings };
 	})
 );
 ---
@@ -42,14 +35,12 @@ const sidebarItems = await Promise.all(
 						<details class="group" open={item.isActive}>
 							<summary
 								class:list={[
-									'flex items-center gap-1 py-1 text-sm transition-colors cursor-pointer list-none',
-									item.isActive
-										? 'text-[var(--color-text)] font-medium'
-										: 'text-[var(--color-text-secondary)] hover:text-[var(--color-text)]',
+									'flex items-center gap-3 px-3 py-2.5 text-sm text-[var(--color-text)] transition-colors cursor-pointer list-none',
+									item.isActive && 'font-medium',
 								]}
 								aria-current={item.isActive ? 'page' : undefined}
 							>
-								<svg class="w-3 h-3 shrink-0 transition-transform group-open:rotate-90" fill="currentColor" viewBox="0 0 20 20">
+								<svg class="w-5 h-5 shrink-0 transition-transform group-open:rotate-90" fill="currentColor" viewBox="0 0 20 20">
 									<path d="M6 4l8 6-8 6V4z" />
 								</svg>
 								<a href={item.href} class="hover:text-[var(--color-text)]">{item.label}</a>
@@ -72,17 +63,15 @@ const sidebarItems = await Promise.all(
 							</ul>
 						</details>
 					) : (
-						<div class="flex items-center gap-1 py-1">
-							<svg class="w-3 h-3 shrink-0 text-[var(--color-text-secondary)]" fill="currentColor" viewBox="0 0 20 20">
+						<div class="flex items-center gap-3 px-3 py-2.5">
+							<svg class="w-5 h-5 shrink-0" fill="currentColor" viewBox="0 0 20 20">
 								<path d="M6 4l8 6-8 6V4z" />
 							</svg>
 							<a
 								href={item.href}
 								class:list={[
-									'text-sm transition-colors',
-									item.isActive
-										? 'text-[var(--color-text)] font-medium'
-										: 'text-[var(--color-text-secondary)] hover:text-[var(--color-text)]',
+									'text-sm text-[var(--color-text)] transition-colors',
+									item.isActive && 'font-medium',
 								]}
 								aria-current={item.isActive ? 'page' : undefined}
 							>
