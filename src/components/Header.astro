@@ -3,20 +3,11 @@
 
 <header class="sticky top-0 z-40 w-full border-b border-[var(--color-border)] bg-[var(--color-bg)]">
 	<div class="mx-auto max-w-screen-xl flex h-14 items-center px-4 lg:px-6">
-		<button
-			id="mobile-menu-toggle"
-			class="lg:hidden mr-3 p-2 rounded-md hover:bg-[var(--color-bg-secondary)]"
-			aria-label="メニューを開く"
-		>
-			<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-			</svg>
-		</button>
 		<a href="/" class="font-bold text-lg text-[var(--color-text)] hover:text-primary-600 dark:hover:text-primary-400 transition-colors">
 			Takayuki Takahashi
 		</a>
 		<div class="flex-1"></div>
-		<div class="flex items-center gap-2">
+		<div class="hidden lg:flex items-center gap-2">
 			<button
 				id="search-toggle"
 				class="p-2 rounded-md hover:bg-[var(--color-bg-secondary)] text-[var(--color-text-secondary)]"
@@ -39,6 +30,20 @@
 				</svg>
 			</button>
 		</div>
+		<button
+			id="mobile-menu-toggle"
+			class="lg:hidden flex items-center gap-1.5 p-2 rounded-md hover:bg-[var(--color-bg-secondary)] text-[var(--color-text)]"
+			aria-label="メニューを開く"
+			aria-expanded="false"
+		>
+			<svg id="mobile-menu-icon-open" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+			</svg>
+			<svg id="mobile-menu-icon-close" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+			</svg>
+			<span id="mobile-menu-label" class="text-sm">メニュー</span>
+		</button>
 	</div>
 </header>
 
@@ -50,10 +55,43 @@
 	});
 
 	const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+
+	function closeMobileMenu() {
+		const menu = document.getElementById('mobile-menu');
+		const iconOpen = document.getElementById('mobile-menu-icon-open');
+		const iconClose = document.getElementById('mobile-menu-icon-close');
+		const label = document.getElementById('mobile-menu-label');
+		if (!menu || menu.classList.contains('hidden')) return;
+		menu.classList.add('hidden');
+		iconOpen?.classList.remove('hidden');
+		iconClose?.classList.add('hidden');
+		if (label) label.textContent = 'メニュー';
+		mobileMenuToggle?.setAttribute('aria-expanded', 'false');
+		mobileMenuToggle?.setAttribute('aria-label', 'メニューを開く');
+		document.body.style.overflow = '';
+	}
+
 	mobileMenuToggle?.addEventListener('click', () => {
 		const menu = document.getElementById('mobile-menu');
-		const overlay = document.getElementById('mobile-menu-overlay');
-		menu?.classList.toggle('-translate-x-full');
-		overlay?.classList.toggle('hidden');
+		const isOpen = menu && !menu.classList.contains('hidden');
+
+		if (isOpen) {
+			closeMobileMenu();
+		} else {
+			const iconOpen = document.getElementById('mobile-menu-icon-open');
+			const iconClose = document.getElementById('mobile-menu-icon-close');
+			const label = document.getElementById('mobile-menu-label');
+			menu?.classList.remove('hidden');
+			iconOpen?.classList.add('hidden');
+			iconClose?.classList.remove('hidden');
+			if (label) label.textContent = 'メニューを閉じる';
+			mobileMenuToggle.setAttribute('aria-expanded', 'true');
+			mobileMenuToggle.setAttribute('aria-label', 'メニューを閉じる');
+			document.body.style.overflow = 'hidden';
+		}
+	});
+
+	document.addEventListener('keydown', (e) => {
+		if (e.key === 'Escape') closeMobileMenu();
 	});
 </script>
